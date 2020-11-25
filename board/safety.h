@@ -9,6 +9,7 @@
 #include "safety/safety_gm.h"
 #include "safety/safety_ford.h"
 #include "safety/safety_hyundai.h"
+#include "safety/safety_hyundai_community.h"
 #include "safety/safety_chrysler.h"
 #include "safety/safety_subaru.h"
 #include "safety/safety_mazda.h"
@@ -39,6 +40,7 @@
 #define SAFETY_SUBARU_LEGACY 22U
 #define SAFETY_HYUNDAI_LEGACY 23U
 #define SAFETY_HYUNDAI_COMMUNITY 24U
+#define SAFETY_HYUNDAI_COMMUNITY_NONSCC 25U
 
 uint16_t current_safety_mode = SAFETY_SILENT;
 const safety_hooks *current_hooks = &nooutput_hooks;
@@ -249,6 +251,8 @@ const safety_hook_config safety_hook_registry[] = {
   {SAFETY_NISSAN, &nissan_hooks},
   {SAFETY_NOOUTPUT, &nooutput_hooks},
   {SAFETY_HYUNDAI_LEGACY, &hyundai_legacy_hooks},
+  {SAFETY_HYUNDAI_COMMUNITY, &hyundai_community_hooks},
+  {SAFETY_HYUNDAI_COMMUNITY_NONSCC, &hyundai_community_nonscc_hooks},
 #ifdef ALLOW_DEBUG
   {SAFETY_MAZDA, &mazda_hooks},
   {SAFETY_SUBARU_LEGACY, &subaru_legacy_hooks},
