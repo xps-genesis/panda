@@ -1,5 +1,13 @@
 # Welcome to panda
 
+To Install
+
+```
+cd /data/openpilot rm -r panda
+git clone https://github.com/xps-genesis/panda.git -b xps_panda
+cd /data/openpilot/panda/board && make && reboot
+```
+
 [panda](http://github.com/commaai/panda) is the nicest universal car interface ever.
 
 <a href="https://comma.ai/shop/products/panda-obd-ii-dongle"><img src="https://github.com/commaai/panda/blob/master/panda.png">
