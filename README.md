@@ -1,4 +1,19 @@
 # Welcome to panda
+To Install
+
+```
+cd /data/openpilot rm -r panda
+git clone https://github.com/xps-genesis/panda.git -b xps_mdpstype1
+cd /data/openpilot/panda/board && make && reboot
+```
+
+To Install:
+
+```
+cd /data/openpilot rm -r panda
+git clone https://github.com/xps-genesis/panda.git -b xps_mdpstype2
+cd /data/openpilot/panda/board && make && reboot
+```
 
 [panda](http://github.com/commaai/panda) is the nicest universal car interface ever.
 
