@@ -28,7 +28,6 @@ const CanMsg HYUNDAI_COMMUNITY_NONSCC_TX_MSGS[] = {
   {1155, 0, 8}, //   FCA12,  Bus 0
   {909, 0, 8},  //   FCA11,  Bus 0
   {2000, 0, 8}, // SCC_DIAG, Bus 0
-  {593, 2, 8}   //  MDPS12,  Bus 2
  };
 
 // TODO: missing checksum for wheel speeds message,worst failure case is
@@ -286,7 +285,7 @@ static int hyundai_community_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_f
   int addr = GET_ADDR(to_fwd);
   // forward cam to ccan and viceversa, except lkas cmd
   if (!relay_malfunction) {
-    if ((bus_num == 0) && (addr != 593)){
+    if (bus_num == 0){
       bus_fwd = 2;
     }
     if ((bus_num == 2) && (addr != 832) && (addr != 1157)) {
