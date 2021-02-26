@@ -102,7 +102,7 @@ static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
      if ((is_op_active) && (steer_type == 4)){
      }
   }
-  to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
+ // to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
