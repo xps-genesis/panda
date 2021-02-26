@@ -66,13 +66,13 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
 
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
-  int apa_torq = 1500; //((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
+  int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
   if ((is_op_active) && (steer_type == 4)){
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
     if(apa_loops_counter >= 5) { 
-       // to_fwd->RDLR |= 0x40;  //replace apa req to true
-      //  to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
+        to_fwd->RDLR |= 0x40;  //replace apa req to true
+        to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
         to_fwd->RDLR |= apa_torq >> 8;  //replace torq
         to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
     }
@@ -113,7 +113,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   if ((addr == 658) && (bus_num == 0)) {
     is_op_active = GET_BYTE(to_push, 0) & 0x10;
     steer_type = GET_BYTE(to_push, 0) >> 5;
-    lkas_torq = (GET_BYTE(to_push, 0) & 0x7) | GET_BYTE(to_push, 1) << 8;
+    lkas_torq = ((GET_BYTE(to_push, 0) & 0x7) << 8) | GET_BYTE(to_push, 1);
   }
   return true;
 }
