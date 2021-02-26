@@ -71,10 +71,10 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   if ((is_op_active) && (steer_type == 4)){
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
     if(apa_loops_counter >= 5) { 
-      to_fwd->RDLR |= 0x40;  //replace apa req to true
-      to_fwd->RDLR |= 0x1 << 8 << 4;  //replace apa type = 1
-      to_fwd->RDLR |= apa_torq >> 8;  //replace torq
-      to_fwd->RDLR |= apa_torq & 0xFF;  //replace torq
+        to_fwd->RDLR |= 0x40;  //replace apa req to true
+     // to_fwd->RDLR |= 0x1 << 8 << 4;  //replace apa type = 1
+     // to_fwd->RDLR |= apa_torq >> 8;  //replace torq
+     // to_fwd->RDLR |= apa_torq & 0xFF;  //replace torq
     }
     else {
       apa_loops_counter++;
