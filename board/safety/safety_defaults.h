@@ -94,14 +94,12 @@ static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
     if(lkas_loops_counter >= 5) {
     }
     else {
-      to_fwd->RDLR &= 0x00000000;  //clear everything for new lkas
       lkas_loops_counter++;
     }
   }
   else {
     lkas_loops_counter = 0;
      if ((is_op_active) && (steer_type == 4)){
-      to_fwd->RDLR &= 0x00000000;  //clear everything
      }
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
