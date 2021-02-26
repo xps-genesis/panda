@@ -82,6 +82,7 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
   else {
     apa_loops_counter = 0;
+    to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
@@ -100,6 +101,9 @@ static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
   else {
     lkas_loops_counter = 0;
+     if ((is_op_active) && (steer_type == 4)){
+      to_fwd->RDLR &= 0x00000000;  //clear everything
+     }
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
