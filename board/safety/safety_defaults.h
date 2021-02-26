@@ -65,6 +65,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
 };
 
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
+  int crc;
   int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
   if ((is_op_active) && (steer_type == 4)){
@@ -88,6 +89,7 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 };
 
 static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
+  int crc;
   if ((is_op_active) && (steer_type == 1)){
     if(lkas_loops_counter >= 5) {
     }
