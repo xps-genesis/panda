@@ -34,6 +34,10 @@ static uint8_t fca_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
 int apa_loops_counter = 0;
 int lkas_loops_counter = 0;
 
+bool is_op_active = false;
+int steer_type = 0;
+int lkas_torq = 0;
+
 static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
 
   int crc;
@@ -100,10 +104,6 @@ static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
 
-bool is_op_active = false;
-int steer_type = 0;
-int lkas_torq = 0;
-
 int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   int addr = GET_ADDR(to_push);
   int bus_num = GET_BUS(to_push);
@@ -145,9 +145,6 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     if (addr == 284) { //veh_speed
       if ((is_op_active) && (steer_type == 1 || steer_type == 4)) {
          send_steer_enable_speed(to_fwd, steer_type);
-      }
-      else {
-        few_loops_counter = 0;
       }
     }
     if ((addr == 658)) { //lkas
