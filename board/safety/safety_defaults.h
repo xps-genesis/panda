@@ -38,7 +38,7 @@ bool is_op_active = false;
 int steer_type = 0;
 int lkas_torq = 0;
 
-static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
+static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
 
   int crc;
   int kph_factor = 128;
@@ -144,7 +144,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
       if ((is_op_active) && (steer_type == 1 || steer_type == 4)) {
-         send_steer_enable_speed(to_fwd, steer_type);
+         send_steer_enable_speed(to_fwd);
       }
     }
     if ((addr == 658)) { //lkas
