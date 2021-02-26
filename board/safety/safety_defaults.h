@@ -66,7 +66,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
 
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
-  int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
+ // int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
   if ((is_op_active) && (steer_type == 4)){
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
