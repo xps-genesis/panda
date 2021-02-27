@@ -100,7 +100,7 @@ static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   else {
     lkas_loops_counter = 0;
      if ((is_op_active) && (steer_type == 4)){
-      to_fwd->RDLR &= 0x00000040;     
+  //    to_fwd->RDLR &= 0x00000040;     
      }
   }
   to_fwd->RDHR &= 0x0000FF;  //clear everything except counter
