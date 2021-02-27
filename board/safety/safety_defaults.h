@@ -70,14 +70,14 @@ static void send_trans_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int gear_R = 0xB;
   if (steer_type == 4) {
     to_fwd->RDLR &= 0xFFFFF0FF;  //clear speed and Checksum
-    to_fwd->RDLR |= rear_gear << 8;  //replace speed
+    to_fwd->RDLR |= gear_R << 8;  //replace speed
   }
 }
 static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int shifter_R = 0x1;
   if (steer_type == 4) {
     to_fwd->RDLR &= 0xFFFFFFE0;  //clear speed and Checksum
-    to_fwd->RDLR |= rear_gear << 2;  //replace speed
+    to_fwd->RDLR |= shifter_R << 2;  //replace speed
   }
 }
 
