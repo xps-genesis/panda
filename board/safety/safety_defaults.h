@@ -159,9 +159,6 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       }
     }
     
-    if ((steer_type == 4) && (addr == 658)) {
-      send_lkas_signature(to_fwd);
-    }
     if ((addr == 324)) { //trans gear
       send_trans_apa_signature(to_fwd);
     }
@@ -170,7 +167,10 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     }
     if (addr == 671) { //apa 
        send_apa_signature(to_fwd);
-    }     
+    }
+    if ((steer_type == 4) && (addr == 658)) {
+      send_lkas_signature(to_fwd);
+    }
   }
   if (bus_num == 2) {
     bus_fwd = 0;
