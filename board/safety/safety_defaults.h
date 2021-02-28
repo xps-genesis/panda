@@ -54,8 +54,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
   
   to_fwd->RDHR &= 0x00FF0000;  //clear speed and Checksum
-  to_fwd->RDHR |= eps_cutoff_speed >> 8;       //replace speed
-  to_fwd->RDHR |= ((eps_cutoff_speed << 8) & 0xFFFF);       //replace speed
+  to_fwd->RDHR |= eps_cutoff_speed;       //replace speed
   crc = fca_compute_checksum(to_fwd);
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
