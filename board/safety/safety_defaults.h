@@ -133,17 +133,15 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   if (bus_num == 0) {
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
-      if ((steer_type == 1) || (steer_type == 2)) {
-         send_steer_enable_speed(to_fwd, steer_type);
-      }
+      send_steer_enable_speed(to_fwd, steer_type);
     }    
-    if ((addr == 324) && (steer_type == 2)) { //trans gear
+    if (addr == 324) { //trans gear
       send_trans_apa_signature(to_fwd, steer_type);
     }
-    if ((addr == 368) && (steer_type == 2)) { //shifter
+    if (addr == 368) { //shifter
       send_shifter_apa_signature(to_fwd, steer_type);
     }
-    if ((addr == 671) && (steer_type == 2)) { //apa 
+    if (addr == 671) { //apa 
        send_apa_signature(to_fwd, steer_type);
     }
   }
