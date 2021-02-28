@@ -45,7 +45,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   
   eps_cutoff_speed = veh_speed;
   
-  if ((type == 4) && (apa_enable_speed <= veh_speed)) {
+  if ((type == 2) && (apa_enable_speed <= veh_speed)) {
     eps_cutoff_speed = apa_enable_speed;  //4kph with 128 factor
   }
   else if ((type == 1) && (lkas_enable_speed >= veh_speed)) {
@@ -60,31 +60,29 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
 
 static void send_trans_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   int gear_R = 0xB;
-  if (type == 4) {
+  if (type == 2) {
     to_fwd->RDLR &= 0xFFFFF0FF;  //clear speed and Checksum
     to_fwd->RDLR |= gear_R << 8;  //replace gear
   }
 }
 static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   int shifter_R = 0x1;
-  if (type == 4) {
+  if (type == 2) {
     to_fwd->RDLR &= 0xFFFFFFE0;  //clear speed and Checksum
     to_fwd->RDLR |= shifter_R << 2;  //replace shifter
   }
 }
 
-int block_lkas_req;
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   int crc;
   int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
-  if ((is_op_active) && (type == 4)){
+  if ((is_op_active) && (type == 2)){
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
     to_fwd->RDLR |= 0x40;  //replace apa req to true
     to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
     to_fwd->RDLR |= apa_torq >> 8;  //replace torq
     to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
-    block_lkas_req = 1;
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
@@ -134,7 +132,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   if (bus_num == 0) {
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
-      if ((steer_type == 1) || (steer_type == 4)) {
+      if ((steer_type == 1) || (steer_type == 2)) {
          send_steer_enable_speed(to_fwd, steer_type);
       }
     }    
