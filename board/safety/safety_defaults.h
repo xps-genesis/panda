@@ -31,9 +31,6 @@ static uint8_t fca_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
   return ~checksum;
 }
 
-int apa_loops_counter = 0;
-int lkas_loops_counter = 0;
-
 bool is_op_active = false;
 int steer_type = 0;
 int lkas_torq = 0;
@@ -58,8 +55,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
   
   to_fwd->RDHR &= 0x00FF0000;  //clear speed and Checksum
-  to_fwd->RDHR |= eps_cutoff_speed >> 8;  //replace speed
-  to_fwd->RDHR |= eps_cutoff_speed << 8;  //replace speed
+  to_fwd->RDHR |= eps_cutoff_speed;       //replace speed
       
   crc = fca_compute_checksum(to_fwd);
     
