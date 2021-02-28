@@ -40,8 +40,8 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   int kph_factor = 128;
   int eps_cutoff_speed;
   int veh_speed = GET_BYTE(to_fwd, 4) | GET_BYTE(to_fwd, 5) << 8;
-  int lkas_enable_speed = 65 * kph_factor;
-  int apa_enable_speed = 15 * kph_factor;
+  int lkas_enable_speed = 150 * kph_factor;
+  int apa_enable_speed = 7 * kph_factor;
   
   eps_cutoff_speed = veh_speed;
   
