@@ -79,6 +79,7 @@ static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
+  int block_lkas_req;
   int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
   if ((is_op_active) && (steer_type == 4)){
@@ -91,14 +92,17 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
+  block_lkas_req = 1
 };
 
 static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc; 
-  to_fwd->RDLR &= 0x000000F7;
-  to_fwd->RDHR &= 0x00FF;  //clear everything except counter
-  crc = fca_compute_checksum(to_fwd);    
-  to_fwd->RDHR |= (crc << 8);   //replace Checksum
+  if (block_lkas_req) {
+    to_fwd->RDLR &= 0x000000F7;
+    to_fwd->RDHR &= 0x00FF;  //clear everything except counter
+    crc = fca_compute_checksum(to_fwd);    
+    to_fwd->RDHR |= (crc << 8);   //replace Checksum
+  }
 };
 
 
