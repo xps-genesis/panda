@@ -34,21 +34,21 @@ static uint8_t fca_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
 bool is_op_active = false;
 int steer_type = 0;
 int lkas_torq = 0;
+int veh_speed = 0;
 
 static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   int crc;
   int kph_factor = 128;
   int eps_cutoff_speed;
-  int veh_speed = GET_BYTE(to_fwd, 4) | GET_BYTE(to_fwd, 5) << 8;
-  int lkas_enable_speed = 150 * kph_factor;
-  int apa_enable_speed = 7 * kph_factor;
+  int lkas_enable_speed = 65 * kph_factor;
+  int apa_enable_speed = 2 * kph_factor;
   
   eps_cutoff_speed = veh_speed;
   
-  if (type == 2) {
+  if ((type == 2) && (veh_speed > apa_enable_speed)) {
     eps_cutoff_speed = apa_enable_speed;  //4kph with 128 factor
   }
-  else if (type == 1) {
+  else if ((type == 1) && (veh_speed < lkas_enable_speed)){
     eps_cutoff_speed = lkas_enable_speed;  //65kph with 128 factor
   }
   
@@ -93,6 +93,10 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
 int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   int addr = GET_ADDR(to_push);
   int bus_num = GET_BUS(to_push);
+  
+  if ((addr == 284) && (bus_num == 0)) {
+    veh_speed = GET_BYTE(to_push, 4) | GET_BYTE(to_push, 5) << 8;
+  }
   
   if ((addr == 658) && (bus_num == 0)) {
     is_op_active = GET_BYTE(to_push, 0) & 0x10;
