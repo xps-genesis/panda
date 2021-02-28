@@ -157,11 +157,11 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     if (addr == 671) { //apa 
        send_apa_signature(to_fwd);
     }
+  }
+  if (bus_num == 2) {
     if ((block_lkas_req) && (addr == 658)) {
       send_lkas_signature(to_fwd);
     }
-  }
-  if (bus_num == 2) {
     bus_fwd = 0;
   }
   return bus_fwd;
