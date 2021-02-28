@@ -95,7 +95,7 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 
 static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc; 
-  to_fwd->RDLR &= 0x00000084;
+  to_fwd->RDLR &= 0x000000F7;
   to_fwd->RDHR &= 0x00FF;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
   to_fwd->RDHR |= (crc << 8);   //replace Checksum
