@@ -32,7 +32,6 @@ static uint8_t fca_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
 }
 
 bool is_op_active = false;
-int steer_type = 0;
 int lkas_torq = 0;
 
 static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
@@ -89,6 +88,8 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   crc = fca_compute_checksum(to_fwd);    
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
+
+int steer_type = 0;
 
 int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   int addr = GET_ADDR(to_push);
