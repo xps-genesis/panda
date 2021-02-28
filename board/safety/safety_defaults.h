@@ -41,7 +41,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
   int eps_cutoff_speed;
   int veh_speed = GET_BYTE(to_fwd, 4) | GET_BYTE(to_fwd, 5) << 8;
   int lkas_enable_speed = 65 * kph_factor;
-  int apa_enable_speed = 4 * kph_factor;
+  int apa_enable_speed = 15` * kph_factor;
   
   eps_cutoff_speed = veh_speed;
   
@@ -53,7 +53,7 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
   
   to_fwd->RDHR &= 0x00FF0000;  //clear speed and Checksum
-  to_fwd->RDHR |= eps_cutoff_speed & 0xFFFF;       //replace speed
+  to_fwd->RDHR |= eps_cutoff_speed;       //replace speed
   crc = fca_compute_checksum(to_fwd);
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
