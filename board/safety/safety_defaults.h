@@ -31,10 +31,6 @@ static uint8_t fca_compute_checksum(CAN_FIFOMailBox_TypeDef *to_push) {
   return ~checksum;
 }
 
-bool is_op_active = false;
-int lkas_torq = 0;
-int steer_type = 0;
-
 static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
   int kph_factor = 128;
@@ -99,7 +95,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     lkas_torq = ((GET_BYTE(to_push, 0) & 0x7) << 8) | GET_BYTE(to_push, 1);
   }
   
-  if ((addr == 678) && (bus_num == 0) && (steer_type == 0)) {
+  if ((addr == 678) && (bus_num == 0) && (steer_type == 3)) {
     steer_type = GET_BYTE(to_push, 6);
   }
   return true;
