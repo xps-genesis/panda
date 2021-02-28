@@ -106,7 +106,7 @@ bool vehicle_moving = false;
 
 bool is_op_active = false;
 int lkas_torq = 0;
-int steer_type = 0;
+int steer_type = 3;
 
 // for safety modes with torque steering control
 int desired_torque_last = 0;       // last desired steer torque
