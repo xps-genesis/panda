@@ -70,14 +70,14 @@ static void send_trans_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int gear_R = 0xB;
   if (steer_type == 4) {
     to_fwd->RDLR &= 0xFFFFF0FF;  //clear speed and Checksum
-    to_fwd->RDLR |= gear_R << 8;  //replace speed
+    to_fwd->RDLR |= gear_R << 8;  //replace gear
   }
 }
 static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int shifter_R = 0x1;
   if (steer_type == 4) {
     to_fwd->RDLR &= 0xFFFFFFE0;  //clear speed and Checksum
-    to_fwd->RDLR |= shifter_R << 2;  //replace speed
+    to_fwd->RDLR |= shifter_R << 2;  //replace shifter
   }
 }
 
@@ -87,18 +87,10 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   
   if ((is_op_active) && (steer_type == 4)){
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
-    if(apa_loops_counter >= 5) { 
-        to_fwd->RDLR |= 0x40;  //replace apa req to true
-        to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
-        to_fwd->RDLR |= apa_torq >> 8;  //replace torq
-        to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
-    }
-    else {
-      apa_loops_counter++;
-    }
-  }
-  else {
-    apa_loops_counter = 0;
+    to_fwd->RDLR |= 0x40;  //replace apa req to true
+    to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
+    to_fwd->RDLR |= apa_torq >> 8;  //replace torq
+    to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
@@ -156,8 +148,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       if ((steer_type == 1) || (steer_type == 4)) {
          send_steer_enable_speed(to_fwd);
       }
-    }
-    
+    }    
     if ((addr == 324)) { //trans gear
       send_trans_apa_signature(to_fwd);
     }
