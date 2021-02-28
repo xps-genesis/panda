@@ -88,21 +88,19 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
     to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
     to_fwd->RDLR |= apa_torq >> 8;  //replace torq
     to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
+    block_lkas_req = 1;
   }
   to_fwd->RDHR &= 0x00FF0000;  //clear everything except counter
   crc = fca_compute_checksum(to_fwd);    
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
-  block_lkas_req = 1;
 };
 
 static void send_lkas_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc; 
-  if (block_lkas_req) {
-    to_fwd->RDLR &= 0x00000004;
-    to_fwd->RDHR &= 0x00FF;  //clear everything except counter
-    crc = fca_compute_checksum(to_fwd);    
-    to_fwd->RDHR |= (crc << 8);   //replace Checksum
-  }
+  to_fwd->RDLR &= 0x00000004;
+  to_fwd->RDHR &= 0x00FF;  //clear everything except counter
+  crc = fca_compute_checksum(to_fwd);    
+  to_fwd->RDHR |= (crc << 8);   //replace Checksum
 };
 
 
@@ -158,7 +156,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     if (addr == 671) { //apa 
        send_apa_signature(to_fwd);
     }
-    if ((steer_type == 4) && (addr == 658)) {
+    if ((block_lkas_req) && (addr == 658)) {
       send_lkas_signature(to_fwd);
     }
   }
