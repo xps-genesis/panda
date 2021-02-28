@@ -45,10 +45,10 @@ static void send_steer_enable_speed(CAN_FIFOMailBox_TypeDef *to_fwd, int type){
   
   eps_cutoff_speed = veh_speed;
   
-  if ((type == 2) && (veh_speed > apa_enable_speed)) {
+  if ((type == 2) && (veh_speed >= apa_enable_speed)) {
     eps_cutoff_speed = apa_enable_speed;  //4kph with 128 factor
   }
-  else if ((type == 1) && (veh_speed < lkas_enable_speed)){
+  else if ((type == 1) && (veh_speed <= lkas_enable_speed)){
     eps_cutoff_speed = lkas_enable_speed;  //65kph with 128 factor
   }
   
