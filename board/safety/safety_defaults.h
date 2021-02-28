@@ -94,7 +94,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     lkas_torq = ((GET_BYTE(to_push, 0) & 0x7) << 8) | GET_BYTE(to_push, 1);
   }
   
-  if ((addr == 678) && (bus_num == 0) && (steer_type == 3)) {
+  if ((addr == 678) && (bus_num == 0)) {
     steer_type = GET_BYTE(to_push, 6);
   }
   return true;
