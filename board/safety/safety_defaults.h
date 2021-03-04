@@ -124,11 +124,11 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   int addr = GET_ADDR(to_fwd);
   int bus_fwd = -1;
   
-  if (bus_num == 0) {
+  if ((bus_num == 0) && ((addr == 284) || (addr == 324) || (addr == 368) || (addr == 671))) { //EPS messages
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
       send_steer_enable_speed(to_fwd);
-    }    
+    }
     if (addr == 324) { //trans gear
       send_trans_apa_signature(to_fwd);
     }
@@ -139,8 +139,14 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
        send_apa_signature(to_fwd);
     }
   }
-  if (bus_num == 2) {
-    bus_fwd = 0;
+  else if (bus_num == 0) {  //ACC messages
+    bus_fwd = 12;
+  }
+  if (bus_num == 1) {
+    bus_fwd = 20;
+  }
+  if (bus_num == 2) { 
+    bus_fwd = 10;
   }
   return bus_fwd;
 }
