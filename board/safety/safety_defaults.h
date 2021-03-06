@@ -83,8 +83,8 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   
   if (steer_type == 2) {
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
-    to_fwd->RDLR |= 0x40;  //replace apa req to true
-    to_fwd->RDLR |= 0x1 << 8 << 8 << 5;  //replace apa type = 1
+    to_fwd->RDLR |= 0x50;  //replace apa req to true
+    to_fwd->RDLR |= 0x20 << 8 << 8;  //replace apa type = 1
     to_fwd->RDLR |= apa_torq >> 8;  //replace torq
     to_fwd->RDLR |= (apa_torq & 0xFF) << 8;  //replace torq
   }
