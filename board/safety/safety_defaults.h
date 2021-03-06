@@ -69,6 +69,14 @@ static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   }
 }
 
+static void send_rev_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
+  int rev = 0x1;
+  if (steer_type == 2) {
+    to_fwd->RDLR &= 0xFFFFFFEF;  //clear speed and Checksum
+    to_fwd->RDLR |= shifter_R << 4;  //replace shifter
+  }
+}
+
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
   int apa_torq = ((lkas_torq - 1024) /2) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
@@ -124,7 +132,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   int addr = GET_ADDR(to_fwd);
   int bus_fwd = -1;
   
-  if ((bus_num == 0) && ((addr == 284) || (addr == 324) || (addr == 368) || (addr == 671))) { //EPS messages
+  if ((bus_num == 0) && ((addr == 284) || (addr == 324) || (addr == 368) || (addr == 671) || (addr == 820))) { //EPS messages
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
       send_steer_enable_speed(to_fwd);
@@ -137,6 +145,9 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
     }
     if (addr == 671) { //apa 
        send_apa_signature(to_fwd);
+    }
+    if (addr == 820) { //shifter
+      send_rev_apa_signature(to_fwd);
     }
   }
   else if (bus_num == 0) {  //ACC messages
