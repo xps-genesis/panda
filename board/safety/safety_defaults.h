@@ -161,7 +161,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
       send_trans_apa_signature(to_fwd);
     }
     if (addr == 344) { //counter
-      send_wspd_apa_signature(to_fwd);
+      send_count_apa_signature(to_fwd);
     }
     if (addr == 368) { //shifter
       send_shifter_apa_signature(to_fwd);
