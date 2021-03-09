@@ -70,10 +70,8 @@ static void send_shifter_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 }
 
 static void send_rev_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
-  int rev = 0x1;
   if (steer_type == 2) {
-    to_fwd->RDLR &= 0xFFFFFFEF;  //clear speed and Checksum
-    to_fwd->RDLR |= rev << 4;  //replace shifter
+    to_fwd->RDLR &= 0xFFFFFFEF;  //clear REV and Checksum
   }
 }
 
