@@ -147,7 +147,7 @@ static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
   int addr = GET_ADDR(to_fwd);
   int bus_fwd = -1;
   
-  if ((bus_num == 0) && ((addr != 658) || (steer_type = 1))) { //EPS messages
+  if (bus_num == 0) { //EPS messages
     bus_fwd = 2;
     if (addr == 284) { //veh_speed
       send_steer_enable_speed(to_fwd);
