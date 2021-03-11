@@ -105,7 +105,7 @@ float vehicle_speed = 0;
 bool vehicle_moving = false;
 
 bool is_op_active = false;
-int lkas_torq = 0;
+int lkas_torq = 1024;
 int steer_type = 3;
 
 // for safety modes with torque steering control
