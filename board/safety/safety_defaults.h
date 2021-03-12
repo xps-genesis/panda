@@ -94,7 +94,7 @@ static void send_xxx_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 
 static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
-  int multi = 1; // steering torq multiplier
+  int multi = 4; // steering torq multiplier
   int apa_torq = ((lkas_torq - 1024) * multi/4) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
   
   if (steer_type == 2) {
