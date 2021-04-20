@@ -109,6 +109,18 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
 };
 
+static void send_acc_decel_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
+  to_fwd->RDLR |= 0x00000000;
+}
+
+static void send_acc_dash_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
+  to_fwd->RDLR |= 0x00000000;
+}
+
+static void send_acc_accel_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
+  to_fwd->RDLR |= 0x00000000;
+}
+
 int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   int addr = GET_ADDR(to_push);
   int bus_num = GET_BUS(to_push);
@@ -145,46 +157,10 @@ static int nooutput_tx_lin_hook(int lin_num, uint8_t *data, int len) {
 }
 
 static int default_fwd_hook(int bus_num, CAN_FIFOMailBox_TypeDef *to_fwd) {
-  int addr = GET_ADDR(to_fwd);
-  int bus_fwd = -1;
-  
-  if (bus_num == 0) { //EPS messages
-    bus_fwd = 2;
-    if (addr == 284) { //veh_speed
-      send_steer_enable_speed(to_fwd);
-    }
-    if (addr == 292) { //xxx
-      send_xxx_apa_signature(to_fwd);
-    }
-    if (addr == 324) { //trans gear
-      send_trans_apa_signature(to_fwd);
-    }
-    if (addr == 344) { //counter
-      send_count_apa_signature(to_fwd);
-    }
-    if (addr == 368) { //shifter
-      send_shifter_apa_signature(to_fwd);
-    }
-    if (addr == 514) { //whl spd
-      send_wspd_apa_signature(to_fwd);
-    }
-    if (addr == 671) { //apa 
-       send_apa_signature(to_fwd);
-    }
-    if (addr == 820) { //shifter
-      send_rev_apa_signature(to_fwd);
-    }
-  }
- // else if ((bus_num == 0) && ((addr != 658) || (steer_type = 1)) {  //ACC messages
- //   bus_fwd = 12;
- // }
-  if (bus_num == 1) {
-    bus_fwd = 20;
-  }
-  if (bus_num == 2) { 
-    bus_fwd = 10;
-  }
-  return bus_fwd;
+  UNUSED(to_fwd);
+  UNUSED(bus_num);
+
+  return -1;
 }
 
 const safety_hooks nooutput_hooks = {

@@ -395,20 +395,106 @@ void can_rx(uint8_t can_number) {
     // modify RDTR for our API
     to_push.RDTR = (to_push.RDTR & 0xFFFF000F) | (bus_number << 4);
 
+        // add to my fifo
+    CAN_FIFOMailBox_TypeDef to_push_mod;
+    to_push_mod.RIR = CAN->sFIFOMailBox[0].RIR;
+    to_push_mod.RDTR = CAN->sFIFOMailBox[0].RDTR;
+    to_push_mod.RDLR = CAN->sFIFOMailBox[0].RDLR;
+    to_push_mod.RDHR = CAN->sFIFOMailBox[0].RDHR;
+
+    // modify RDTR for our API
+    to_push_mod.RDTR = (to_push_mod.RDTR & 0xFFFF000F) | (bus_number << 4);
+
+    int addr;
+
     // forwarding (panda only)
     int bus_fwd_num = (can_forwarding[bus_number] != -1) ? can_forwarding[bus_number] : safety_fwd_hook(bus_number, &to_push);
-    if (bus_fwd_num != -1) {
+    if (bus_fwd_num == -1) {
       CAN_FIFOMailBox_TypeDef to_send;
       to_send.RIR = to_push.RIR | 1; // TXRQ
       to_send.RDTR = to_push.RDTR;
       to_send.RDLR = to_push.RDLR;
       to_send.RDHR = to_push.RDHR;
-      if (bus_fwd_num > 9) {
-        can_send(&to_send, (bus_fwd_num / 10), true);
-        can_send(&to_send, (bus_fwd_num % 10), true);
-      } else {
-        can_send(&to_send, bus_fwd_num, true);
+      addr = GET_ADDR(&to_send);
+      if (bus_number == 2) {
+        can_send(&to_send, 0, true);
+        can_send(&to_send, 1, true);
+      } else if (bus_number == 0){
+        if ((addr != 284) && (addr != 292) && (addr != 324) && (addr != 344) && (addr != 368) && (addr != 514) && (addr != 671) && (addr != 820)) {
+          can_send(&to_send, 1, true);
+          can_send(&to_send, 2, true);
+        }
+        else {
+          can_send(&to_send, 1, true);
+        }
+      } else if (bus_number == 1){
+        if ((addr != 500) && (addr != 501) && (addr != 625)) {
+          can_send(&to_send, 0, true);
+          can_send(&to_send, 2, true);
+        }
+        else{
+          can_send(&to_send, 2, true);
+        }
       }
+
+      addr = GET_ADDR(&to_push_mod);
+
+      CAN_FIFOMailBox_TypeDef to_send_mod;
+      to_send_mod.RIR = to_push_mod.RIR | 1; // TXRQ
+      to_send_mod.RDTR = to_push_mod.RDTR;
+      to_send_mod.RDLR = to_push_mod.RDLR;
+      to_send_mod.RDHR = to_push_mod.RDHR;
+
+      if (bus_number == 0) {  // TO EPS
+        if (addr == 284) { //veh_speed
+          send_steer_enable_speed(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+         }
+        if (addr == 292) { //xxx
+          send_xxx_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 324) { //trans gear
+          send_trans_apa_signature(&to_send_mod);
+          can_send(&to_send_mod,2, true);
+        }
+        if (addr == 344) { //counter
+          send_count_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 368) { //shifter
+          send_shifter_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 514) { //whl spd
+          send_wspd_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 671) { //apa
+          send_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 820) { //shifter
+          send_rev_apa_signature(&to_send_mod);
+          can_send(&to_send_mod, 2, true);
+        }
+     }
+
+     if (bus_number == 1) {
+        if (addr == 500) { //0x1f4
+          send_acc_decel_msg(&to_send_mod);
+          can_send(&to_send_mod, 0, true);
+         }
+        if (addr == 501) { //0x1f5
+          send_acc_dash_msg(&to_send_mod);
+          can_send(&to_send_mod, 0, true);
+        }
+        if (addr == 625) { //0x271
+          send_acc_accel_msg(&to_send_mod);
+          can_send(&to_send_mod, 0, true);
+        }
+     }
+
     }
 
     can_rx_errs += safety_rx_hook(&to_push) ? 0U : 1U;
