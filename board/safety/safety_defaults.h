@@ -125,7 +125,6 @@ static void send_acc_decel_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
 
     to_fwd->RDHR |= command_type << 4;
     to_fwd->RDHR |= ((acc_brk_prep << 8) << 8) << 1;
-    to_fwd->RDHR |= ((command_type_2 << 8) << 8) << 2;
 
     crc = fca_compute_checksum(to_fwd);
     to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
@@ -219,7 +218,6 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
        acc_decel_cmd = ((GET_BYTE(to_push, 2) & 0xF) << 8) | GET_BYTE(to_push, 3);
        command_type = (GET_BYTE(to_push, 4) >> 4) & 0x7;
        acc_brk_prep = (GET_BYTE(to_push, 6) >> 1) & 0x1;
-       command_type_2 = (GET_BYTE(to_push, 6) >> 2) & 0x3;
     }
   }
 

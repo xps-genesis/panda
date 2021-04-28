@@ -123,7 +123,6 @@ int acc_decel_cmd = 4094;
 bool acc_available = false;
 bool acc_enabled = false;
 bool acc_brk_prep = false;
-int command_type_2 = 0;
 int command_type = 0;
 
 bool acc_eng_req = 0;
