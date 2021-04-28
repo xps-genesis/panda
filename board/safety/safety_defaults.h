@@ -96,7 +96,7 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
   int crc;
   int multi = 4; // steering torq multiplier
   int apa_torq = ((lkas_torq - 1024) * multi/4) + 1024;  //LKAS torq 768 to 1280 +-0.5NM  512  //APA torq 896 to 1152 +-1NM 128 0x80
-  
+
   if ((steer_type == 2) && is_op_active) {
     to_fwd->RDLR &= 0x00000000;  //clear everything for new apa
     to_fwd->RDLR |= 0x50;  //replace apa req to true
@@ -110,15 +110,82 @@ static void send_apa_signature(CAN_FIFOMailBox_TypeDef *to_fwd){
 };
 
 static void send_acc_decel_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
-  to_fwd->RDLR |= 0x00000000;
+  int crc;
+
+  if (is_oplong_enabled && !org_collision_active) {
+    to_fwd->RDLR &= 0x00000000;
+    to_fwd->RDHR &= 0x00F10080; // keep the counter
+
+    to_fwd->RDLR |= acc_stop << 5;
+    to_fwd->RDLR |= acc_go << 6;
+    to_fwd->RDLR |= ((acc_decel_cmd >> 8) << 8) << 8;
+    to_fwd->RDLR |= ((acc_available << 8) << 8) << 4;
+    to_fwd->RDLR |= ((acc_enabled << 8) << 8) << 5;
+    to_fwd->RDLR |= ((acc_decel_cmd << 8) << 8) << 8;
+
+    to_fwd->RDHR |= command_type << 4;
+    to_fwd->RDHR |= ((acc_brk_prep << 8) << 8) << 1;
+    to_fwd->RDHR |= ((command_type_2 << 8) << 8) << 2;
+
+    crc = fca_compute_checksum(to_fwd);
+    to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
+  }
+  else { //pass through
+    to_fwd->RDLR |= 0x00000000;
+    to_fwd->RDHR |= 0x00000000;
+  }
 }
 
 static void send_acc_dash_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
-  to_fwd->RDLR |= 0x00000000;
+
+  if (is_oplong_enabled && !org_collision_active) {
+    to_fwd->RDLR &= 0x7C000000;
+    to_fwd->RDHR &= 0x00C8C000;
+    to_fwd->RDLR |= acc_text_msg;
+    to_fwd->RDLR |= acc_set_speed_kph << 8;
+    to_fwd->RDLR |= (acc_set_speed_mph << 8) << 8;
+    to_fwd->RDLR |= (((acc_text_req << 8) << 8) << 8) << 7;
+
+    to_fwd->RDHR |= cruise_state << 4;
+    to_fwd->RDHR |= cruise_icon << 8;
+    to_fwd->RDHR |= ((lead_dist << 8) << 8) << 8;
+  }
+  else { //pass through
+    to_fwd->RDLR |= 0x00000000;
+    to_fwd->RDHR |= 0x00000000;
+  }
 }
 
 static void send_acc_accel_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
-  to_fwd->RDLR |= 0x00000000;
+  int crc;
+
+  if (is_oplong_enabled && !org_collision_active) {
+    to_fwd->RDHR &= 0x00FF0000; // keep the counter
+    to_fwd->RDHR |= (acc_eng_req << 7);
+    to_fwd->RDHR |= (acc_torq >> 8) | ((acc_torq << 8) & 0xFFFF);
+    crc = fca_compute_checksum(to_fwd);
+    to_fwd->RDHR |= (((crc << 8) << 8) << 8);   //replace Checksum
+  }
+  else { //pass through
+    to_fwd->RDLR |= 0x00000000;
+    to_fwd->RDHR |= 0x00000000;
+  }
+}
+
+static void send_wheel_button_msg(CAN_FIFOMailBox_TypeDef *to_fwd){
+  int crc;
+  if (is_oplong_enabled) {
+    to_fwd->RDLR &= 0x00F000; // keep the counter
+    if (org_acc_available) {
+        to_fwd->RDLR |= 0x80; // send acc button to remove acc available status
+    }
+  crc = fca_compute_checksum(to_fwd);
+  to_fwd->RDLR |= ((crc << 8) << 8);   //replace Checksum
+  }
+  else { //pass through
+    to_fwd->RDLR |= 0x00000000;
+    to_fwd->RDHR |= 0x00000000;
+  }
 }
 
 int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
@@ -126,12 +193,62 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   int bus_num = GET_BUS(to_push);
   
   if ((addr == 658) && (bus_num == 0)) {
-    is_op_active = GET_BYTE(to_push, 0) & 0x10;
+    is_op_active = (GET_BYTE(to_push, 0) >> 4) & 0x1;
     lkas_torq = ((GET_BYTE(to_push, 0) & 0x7) << 8) | GET_BYTE(to_push, 1);
+  }
+
+  if ((addr == 503) && (bus_num == 0)) {
+    is_oplong_enabled = GET_BYTE(to_push, 3) & 0x1;
+    if (is_oplong_enabled) {
+       acc_text_msg = GET_BYTE(to_push, 0);
+       acc_set_speed_kph = GET_BYTE(to_push, 1);
+       acc_set_speed_mph = GET_BYTE(to_push, 2);
+       cruise_state = (GET_BYTE(to_push, 4) >> 4) & 0x7;
+       cruise_icon = GET_BYTE(to_push, 5) & 0x3F;
+       lead_dist = GET_BYTE(to_push, 7);
+       acc_text_req = GET_BYTE(to_push, 3) >> 7;
+    }
+  }
+
+  if ((addr == 502) && (bus_num == 0)) {
+    if (is_oplong_enabled) {
+       acc_stop = (GET_BYTE(to_push, 0) >> 5) & 0x1;
+       acc_go = (GET_BYTE(to_push, 0) >> 6) & 0x1;
+       acc_available = (GET_BYTE(to_push, 2) >> 4) & 0x1;
+       acc_enabled = (GET_BYTE(to_push, 2) >> 5) & 0x1;
+       acc_decel_cmd = ((GET_BYTE(to_push, 2) & 0xF) << 8) | GET_BYTE(to_push, 3);
+       command_type = (GET_BYTE(to_push, 4) >> 4) & 0x7;
+       acc_brk_prep = (GET_BYTE(to_push, 6) >> 1) & 0x1;
+       command_type_2 = (GET_BYTE(to_push, 6) >> 2) & 0x3;
+    }
+  }
+
+  if ((addr == 626) && (bus_num == 0)) {
+    if (is_oplong_enabled) {
+       acc_eng_req = (GET_BYTE(to_push, 4) >> 7) & 0x1;
+       acc_torq = (GET_BYTE(to_push, 4) & 0x7F) << 8 | GET_BYTE(to_push, 5);
+    }
   }
   
   if ((addr == 678) && (bus_num == 0)) {
     steer_type = GET_BYTE(to_push, 6);
+  }
+
+  if ((addr == 500) && (bus_num == 1)) {
+    if (is_oplong_enabled) {
+       org_acc_available = (GET_BYTE(to_push, 2) >> 4) & 0x1;
+       org_cmd_type = (GET_BYTE(to_push, 4) >> 4) & 0x7;
+       org_brk_pul = GET_BYTE(to_push, 6) & 0x1;
+       if (org_brk_pul || (org_cmd_type > 1)) {
+         org_collision_active = true;
+       }
+       else {
+         org_collision_active = false;
+       }
+    }
+    else{
+       org_acc_available = false;
+    }
   }
   return true;
 }

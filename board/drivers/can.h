@@ -421,14 +421,20 @@ void can_rx(uint8_t can_number) {
         can_send(&to_send, 1, true);
       } else if (bus_number == 0){
         if ((addr != 284) && (addr != 292) && (addr != 324) && (addr != 344) && (addr != 368) && (addr != 514) && (addr != 671) && (addr != 820)) {
-          can_send(&to_send, 1, true);
-          can_send(&to_send, 2, true);
+          if((addr == 502) || (addr == 503) || (addr == 626) || (addr == 838)){}
+          else if (addr == 571) {
+            can_send(&to_send, 2, true);
+          }
+          else {
+            can_send(&to_send, 1, true);
+            can_send(&to_send, 2, true);
+          }
         }
         else {
           can_send(&to_send, 1, true);
         }
       } else if (bus_number == 1){
-        if ((addr != 500) && (addr != 501) && (addr != 625)) {
+        if ((addr != 500) && (addr != 501) && (addr != 625) && (!is_oplong_enabled || (addr != 838))) {
           can_send(&to_send, 0, true);
           can_send(&to_send, 2, true);
         }
@@ -477,6 +483,10 @@ void can_rx(uint8_t can_number) {
         if (addr == 820) { //shifter
           send_rev_apa_signature(&to_send_mod);
           can_send(&to_send_mod, 2, true);
+        }
+        if (addr == 571) { //wheel buttons
+          send_wheel_button_msg(&to_send_mod);
+          can_send(&to_send_mod, 1, true);
         }
      }
 

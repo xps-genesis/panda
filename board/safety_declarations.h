@@ -108,6 +108,32 @@ bool is_op_active = false;
 int lkas_torq = 1024;
 int steer_type = 3;
 
+bool is_oplong_enabled = false;
+int acc_set_speed_kph = 255;
+int acc_set_speed_mph = 255;
+int cruise_state = 0;
+int cruise_icon = 0;
+int lead_dist = 255;
+int acc_text_msg = 0;
+bool acc_text_req = false;
+
+bool acc_stop = false;
+bool acc_go = false;
+int acc_decel_cmd = 4094;
+bool acc_available = false;
+bool acc_enabled = false;
+bool acc_brk_prep = false;
+int command_type_2 = 0;
+int command_type = 0;
+
+bool acc_eng_req = 0;
+int acc_torq = 7767;
+
+bool org_acc_available = false;
+int org_cmd_type = 0;
+bool org_brk_pul = false;
+bool org_collision_active = false;
+
 // for safety modes with torque steering control
 int desired_torque_last = 0;       // last desired steer torque
 int rt_torque_last = 0;            // last desired torque for real time check
