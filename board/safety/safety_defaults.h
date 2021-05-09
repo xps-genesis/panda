@@ -210,7 +210,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
 
     if (counter_658 > 0) {
         counter_284_658 += 2;
-        if ((counter_284_658 - counter_658 > 25) && (counter_658 > 0)){
+        if (counter_284_658 - counter_658 > 25){
             is_op_active = false;
             steer_type = 3;
             counter_658 = 0;
