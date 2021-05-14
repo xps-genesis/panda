@@ -247,7 +247,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   }
   
   if ((addr == 678) && (bus_num == 0)) {
-    steer_type = GET_BYTE(to_push, 6);
+    steer_type = 1; // GET_BYTE(to_push, 6);
   }
 
   if ((addr == 500) && (bus_num == 1)) {
