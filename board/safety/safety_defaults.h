@@ -194,8 +194,7 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
   if ((addr == 658) && (bus_num == 0)) {
     is_op_active = (GET_BYTE(to_push, 0) >> 4) & 0x1;
     lkas_torq = ((GET_BYTE(to_push, 0) & 0x7) << 8) | GET_BYTE(to_push, 1);
-    counter_658 += 1;
-    counter_284_658 = counter_658;
+    counter_658 = 0;
   }
 
   if ((addr == 502) && (bus_num == 0)) {
@@ -206,29 +205,21 @@ int default_rx_hook(CAN_FIFOMailBox_TypeDef *to_push) {
     acc_decel_cmd = ((GET_BYTE(to_push, 2) & 0xF) << 8) | GET_BYTE(to_push, 3);
     command_type = (GET_BYTE(to_push, 4) >> 4) & 0x7;
     acc_brk_prep = (GET_BYTE(to_push, 6) >> 1) & 0x1;
-    counter_502 += 1;
-    counter_284_502 = counter_502;
+    counter_502 = 0;
   }
   
   if ((addr == 284) && (bus_num == 0)) {
-    if (counter_502 > 0) {
-        counter_284_502 += 1;
-        if (counter_284_502 - counter_502 > 25) {
-            is_oplong_enabled = false;
-            acc_enabled = false;
-            counter_502 = 0;
-            counter_284_502 = 0;
-        }
+    counter_502 += 1;
+    counter_658 += 2;
+    
+    if (counter_502 > 25) {
+       is_oplong_enabled = false;
+       acc_enabled = false;
     }
 
-    if (counter_658 > 0) {
-        counter_284_658 += 2;
-        if (counter_284_658 - counter_658 > 25){
-            is_op_active = false;
-            steer_type = 3;
-            counter_658 = 0;
-            counter_284_658 = 0;
-        }
+    if (counter_658 > 25) {
+       is_op_active = false;
+       steer_type = 3;
     }
   }
 
